@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  pending_approval
+  active
+  inactive
+  withdrawn
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  loginId    String     @unique @map("login_id") @db.VarChar(50)
+  password   String     @db.VarChar(255)
+  name       String     @db.VarChar(50)
+  email      String     @unique @db.VarChar(100)
+  status     UserStatus @default(pending_approval)
+  roleId     Int        @map("role_id")
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  posts      Post[]
+  comments   Comment[]
+  attendance Attendance[]
+  evaluations Evaluation[]
+  fees       Fee[]
+
+  @@map("users")
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique @db.VarChar(50)
+  description String?          @db.Text
+
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          Int              @id @default(autoincrement())
+  action      String           @unique @db.VarChar(100)
+  description String?          @db.Text
+
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int @map("role_id")
+  permissionId Int @map("permission_id")
+
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?  @db.Text
+
+  posts       Post[]
+
+  @@map("categories")
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  title      String   @db.VarChar(255)
+  content    String   @db.Text
+  authorId   Int      @map("author_id")
+  categoryId Int      @map("category_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  author     User     @relation(fields: [authorId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+  comments   Comment[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  authorId  Int      @map("author_id")
+  postId    Int      @map("post_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  author    User     @relation(fields: [authorId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Book {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  author      String   @db.VarChar(100)
+  publisher   String   @db.VarChar(100)
+  isbn        String?  @unique @db.VarChar(20)
+  location    String?  @db.VarChar(50)
+  status      String   @default("available") @db.VarChar(20)
+  borrowerId  Int?     @map("borrower_id")
+  borrowedAt  DateTime? @map("borrowed_at")
+  returnDate  DateTime? @map("return_date")
+
+  @@map("books")
+}
+
+model Fee {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  amount      Decimal  @db.Decimal(10, 2)
+  semester    String   @db.VarChar(20)
+  year        Int
+  paidAt      DateTime? @map("paid_at")
+  status      String   @default("unpaid") @db.VarChar(20)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("fees")
+}
+
+model Attendance {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  eventId   Int      @map("event_id")
+  status    String   @db.VarChar(20)
+  checkInAt DateTime? @map("check_in_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+  event     CalendarEvent @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+  @@map("attendance")
+}
+
+model Evaluation {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  semester   String   @db.VarChar(20)
+  year       Int
+  score      Decimal  @db.Decimal(3, 2)
+  comments   String?  @db.Text
+  evaluatorId Int     @map("evaluator_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@map("evaluations")
+}
+
+model CalendarEvent {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+  location    String?  @db.VarChar(255)
+  eventType   String   @map("event_type") @db.VarChar(50)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  attendance  Attendance[]
+
+  @@map("calendar_events")
+}
