@@ -30,6 +30,7 @@ model User {
   attendance Attendance[]
   evaluations Evaluation[]
   fees       Fee[]
+  files      File[]
 
   @@map("users")
 }
@@ -177,4 +178,20 @@ model CalendarEvent {
   attendance  Attendance[]
 
   @@map("calendar_events")
+}
+
+model File {
+  id           Int      @id @default(autoincrement())
+  filename     String   @db.VarChar(255)
+  originalName String   @map("original_name") @db.VarChar(255)
+  mimetype     String   @db.VarChar(100)
+  size         Int
+  purpose      String   @db.VarChar(100)
+  path         String   @db.VarChar(500)
+  uploaderId   Int      @map("uploader_id")
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+
+  uploader     User     @relation(fields: [uploaderId], references: [id])
+
+  @@map("files")
 }

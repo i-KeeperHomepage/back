@@ -156,3 +156,11 @@ export type CreateAttendanceInput = z.infer<typeof createAttendanceSchema>;
 export type UpdateAttendanceInput = z.infer<typeof updateAttendanceSchema>;
 export type CreateEvaluationInput = z.infer<typeof createEvaluationSchema>;
 export type UpdateEvaluationInput = z.infer<typeof updateEvaluationSchema>;
+
+// File schemas
+export const uploadFileSchema = z.object({
+  purpose: z.enum(['profile', 'document', 'attachment', 'other']),
+  description: z.string().optional()
+});
+
+export type UploadFileInput = z.infer<typeof uploadFileSchema>;

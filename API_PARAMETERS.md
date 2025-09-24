@@ -14,6 +14,7 @@
 - [도서 관리 (Books)](#도서-관리-books)
 - [회비 관리 (Fees)](#회비-관리-fees)
 - [평가 관리 (Evaluations)](#평가-관리-evaluations)
+- [파일 관리 (Files)](#파일-관리-files)
 
 ---
 
@@ -1125,6 +1126,142 @@
     "difference": 0.5
   },
   "pagination": {...}
+}
+```
+
+---
+
+## 파일 관리 (Files)
+
+### POST /api/files/upload
+**설명**: 파일 업로드 (upload_file 권한 필요)
+
+**Request**: multipart/form-data
+| 필드 | 타입 | 필수 | 제약사항 | 설명 |
+|------|------|------|----------|------|
+| file | File | ✅ | 최대 10MB (환경변수 설정 가능) | 업로드할 파일 |
+| purpose | string | ✅ | enum: profile, document, attachment, other | 파일 용도 |
+| description | string | ❌ | - | 파일 설명 |
+
+**예제 요청**: FormData 사용
+```javascript
+const formData = new FormData();
+formData.append('file', fileInput.files[0]);
+formData.append('purpose', 'document');
+formData.append('description', '회의록 문서');
+```
+
+**성공 응답 (201 Created)**:
+```json
+{
+  "id": 1,
+  "filename": "550e8400-e29b-41d4-a716-446655440000.pdf",
+  "originalName": "meeting_notes.pdf",
+  "mimetype": "application/pdf",
+  "size": 204800,
+  "purpose": "document",
+  "uploadedAt": "2025-09-17T10:30:00.000Z",
+  "uploader": {
+    "id": 1,
+    "name": "홍길동"
+  }
+}
+```
+
+### GET /api/files
+**설명**: 파일 목록 조회 (view_files 또는 view_own_files 권한 필요)
+
+**Query Parameters** (선택적):
+| 파라미터 | 타입 | 설명 |
+|----------|------|------|
+| page | number | 페이지 번호 (기본값: 1) |
+| limit | number | 페이지당 항목 수 (기본값: 10) |
+| purpose | string | 파일 용도로 필터링 |
+| uploaderId | number | 업로더 ID로 필터링 |
+
+**Note**:
+- view_files 권한이 있으면 모든 파일 조회 가능
+- view_own_files 권한만 있으면 본인이 업로드한 파일만 조회 가능
+
+**예제 요청**: `/api/files?page=1&limit=10&purpose=document`
+
+**성공 응답 (200 OK)**:
+```json
+{
+  "files": [
+    {
+      "id": 1,
+      "filename": "550e8400-e29b-41d4-a716-446655440000.pdf",
+      "originalName": "meeting_notes.pdf",
+      "mimetype": "application/pdf",
+      "size": 204800,
+      "purpose": "document",
+      "uploadedAt": "2025-09-17T10:30:00.000Z",
+      "uploader": {
+        "id": 1,
+        "name": "홍길동",
+        "email": "hong@example.com"
+      }
+    }
+  ],
+  "pagination": {
+    "total": 25,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 3
+  }
+}
+```
+
+### GET /api/files/{fileId}
+**설명**: 파일 정보 조회 (view_files 또는 view_own_files 권한 필요)
+
+**Path Parameter**:
+- `fileId`: 파일 ID (숫자)
+
+**성공 응답 (200 OK)**:
+```json
+{
+  "id": 1,
+  "filename": "550e8400-e29b-41d4-a716-446655440000.pdf",
+  "originalName": "meeting_notes.pdf",
+  "mimetype": "application/pdf",
+  "size": 204800,
+  "purpose": "document",
+  "uploadedAt": "2025-09-17T10:30:00.000Z",
+  "uploader": {
+    "id": 1,
+    "name": "홍길동",
+    "email": "hong@example.com"
+  }
+}
+```
+
+### GET /api/files/{fileId}/download
+**설명**: 파일 다운로드 (download_file 권한 필요)
+
+**Path Parameter**:
+- `fileId`: 파일 ID (숫자)
+
+**성공 응답 (200 OK)**:
+- Content-Type: 파일의 MIME 타입
+- Content-Disposition: attachment; filename="원본파일명"
+- 바이너리 파일 데이터
+
+### DELETE /api/files/{fileId}
+**설명**: 파일 삭제 (delete_own_file 또는 delete_any_file 권한 필요)
+
+**Path Parameter**:
+- `fileId`: 파일 ID (숫자)
+
+**Note**:
+- delete_any_file 권한이 있으면 모든 파일 삭제 가능
+- delete_own_file 권한만 있으면 본인이 업로드한 파일만 삭제 가능
+
+**성공 응답 (200 OK)**:
+```json
+{
+  "message": "File deleted successfully"
 }
 ```
 

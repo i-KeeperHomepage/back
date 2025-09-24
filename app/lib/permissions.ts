@@ -287,4 +287,12 @@ export const PERMISSIONS = {
   VIEW_EVALUATIONS: 'view_evaluations',
   MANAGE_EVALUATIONS: 'manage_evaluations',
   VIEW_OWN_EVALUATIONS: 'view_own_evaluations',
+
+  // File Management
+  UPLOAD_FILE: 'upload_file',
+  VIEW_FILES: 'view_files',
+  VIEW_OWN_FILES: 'view_own_files',
+  DELETE_OWN_FILE: 'delete_own_file',
+  DELETE_ANY_FILE: 'delete_any_file',
+  DOWNLOAD_FILE: 'download_file',
 } as const;

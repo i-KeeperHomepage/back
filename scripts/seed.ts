@@ -10,16 +10,25 @@ async function main() {
   const permissions = await Promise.all([
     // User Management Permissions
     prisma.permission.create({
-      data: { action: "view_pending_users", description: "View users pending approval" },
+      data: {
+        action: "view_pending_users",
+        description: "View users pending approval",
+      },
     }),
     prisma.permission.create({
-      data: { action: "approve_users", description: "Approve or reject user registrations" },
+      data: {
+        action: "approve_users",
+        description: "Approve or reject user registrations",
+      },
     }),
     prisma.permission.create({
       data: { action: "view_all_users", description: "View all users" },
     }),
     prisma.permission.create({
-      data: { action: "view_user_details", description: "View detailed user information" },
+      data: {
+        action: "view_user_details",
+        description: "View detailed user information",
+      },
     }),
     prisma.permission.create({
       data: { action: "update_user", description: "Update user information" },
@@ -36,7 +45,10 @@ async function main() {
       data: { action: "create_role", description: "Create new roles" },
     }),
     prisma.permission.create({
-      data: { action: "transfer_role", description: "Transfer roles between users" },
+      data: {
+        action: "transfer_role",
+        description: "Transfer roles between users",
+      },
     }),
 
     // Post Management Permissions
@@ -86,7 +98,10 @@ async function main() {
       data: { action: "view_books", description: "View book list" },
     }),
     prisma.permission.create({
-      data: { action: "manage_books", description: "Add, edit, and delete books" },
+      data: {
+        action: "manage_books",
+        description: "Add, edit, and delete books",
+      },
     }),
     prisma.permission.create({
       data: { action: "borrow_book", description: "Borrow books" },
@@ -114,21 +129,33 @@ async function main() {
       data: { action: "view_events", description: "View events" },
     }),
     prisma.permission.create({
-      data: { action: "manage_events", description: "Create, edit, and delete events" },
+      data: {
+        action: "manage_events",
+        description: "Create, edit, and delete events",
+      },
     }),
 
     // Attendance Management Permissions
     prisma.permission.create({
-      data: { action: "view_attendance", description: "View attendance records" },
+      data: {
+        action: "view_attendance",
+        description: "View attendance records",
+      },
     }),
     prisma.permission.create({
-      data: { action: "manage_attendance", description: "Manage attendance records" },
+      data: {
+        action: "manage_attendance",
+        description: "Manage attendance records",
+      },
     }),
     prisma.permission.create({
       data: { action: "check_in", description: "Check in for events" },
     }),
     prisma.permission.create({
-      data: { action: "view_own_attendance", description: "View own attendance records" },
+      data: {
+        action: "view_own_attendance",
+        description: "View own attendance records",
+      },
     }),
 
     // Evaluation Management Permissions
@@ -136,25 +163,81 @@ async function main() {
       data: { action: "view_evaluations", description: "View all evaluations" },
     }),
     prisma.permission.create({
-      data: { action: "manage_evaluations", description: "Create and edit evaluations" },
+      data: {
+        action: "manage_evaluations",
+        description: "Create and edit evaluations",
+      },
     }),
     prisma.permission.create({
-      data: { action: "view_own_evaluations", description: "View own evaluation records" },
+      data: {
+        action: "view_own_evaluations",
+        description: "View own evaluation records",
+      },
+    }),
+
+    // File Management Permissions
+    prisma.permission.create({
+      data: { action: "upload_file", description: "Upload files" },
+    }),
+    prisma.permission.create({
+      data: { action: "view_files", description: "View all files" },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "view_own_files",
+        description: "View own uploaded files",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "delete_own_file",
+        description: "Delete own uploaded files",
+      },
+    }),
+    prisma.permission.create({
+      data: { action: "delete_any_file", description: "Delete any file" },
+    }),
+    prisma.permission.create({
+      data: { action: "download_file", description: "Download files" },
     }),
   ]);
 
   // Group permissions by role
   const adminPermissions = permissions; // Admin gets all permissions
 
-  const memberPermissions = permissions.filter(p =>
-    ["create_post", "edit_own_post", "delete_own_post", "create_comment",
-     "view_posts", "view_comments", "view_categories", "view_books", "borrow_book",
-     "return_book", "view_own_fees", "pay_fee", "view_events", "check_in",
-     "view_own_attendance", "view_own_evaluations"].includes(p.action)
+  const memberPermissions = permissions.filter((p) =>
+    [
+      "create_post",
+      "edit_own_post",
+      "delete_own_post",
+      "create_comment",
+      "view_posts",
+      "view_comments",
+      "view_categories",
+      "view_books",
+      "borrow_book",
+      "return_book",
+      "view_own_fees",
+      "pay_fee",
+      "view_events",
+      "check_in",
+      "view_own_attendance",
+      "view_own_evaluations",
+      "upload_file",
+      "view_own_files",
+      "delete_own_file",
+      "download_file",
+    ].includes(p.action)
   );
 
-  const nonMemberPermissions = permissions.filter(p =>
-    ["view_posts", "view_comments", "view_categories", "view_books", "view_events"].includes(p.action)
+  const nonMemberPermissions = permissions.filter((p) =>
+    [
+      "view_posts",
+      "view_comments",
+      "view_categories",
+      "view_books",
+      "view_events",
+    ].includes(p.action)
   );
 
   // Create default roles
