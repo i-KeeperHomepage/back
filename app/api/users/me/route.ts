@@ -29,6 +29,13 @@ export async function GET(request: NextRequest) {
             path: true,
           }
         },
+        profileImage: {
+          select: {
+            id: true,
+            filename: true,
+            path: true,
+          }
+        },
         awards: {
           select: {
             id: true,
@@ -121,7 +128,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, major, class: userClass } = body;
+    const { name, email, major, class: userClass, profileImageId } = body;
 
     const updateData: any = {};
     if (name) updateData.name = name;
@@ -136,6 +143,9 @@ export async function PATCH(request: NextRequest) {
         );
       }
       updateData.class = userClass;
+    }
+    if (profileImageId !== undefined) {
+      updateData.profileImageId = profileImageId;
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -170,7 +180,14 @@ export async function PATCH(request: NextRequest) {
         email: true,
         major: true,
         class: true,
-        status: true
+        status: true,
+        profileImage: {
+          select: {
+            id: true,
+            filename: true,
+            path: true
+          }
+        }
       }
     });
 

@@ -45,6 +45,20 @@ export async function GET(
           },
           orderBy: { createdAt: "desc" },
         },
+        files: {
+          select: {
+            file: {
+              select: {
+                id: true,
+                filename: true,
+                originalName: true,
+                mimetype: true,
+                size: true,
+                path: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -117,9 +131,30 @@ export async function PATCH(
       }
     }
 
+    // Handle file attachments update
+    const { fileIds, ...postData } = validatedData;
+
+    const updateData: any = { ...postData };
+
+    if (fileIds !== undefined) {
+      // Delete existing file associations and create new ones
+      await prisma.postFile.deleteMany({
+        where: { postId: parseInt(postId) },
+      });
+
+      if (fileIds.length > 0) {
+        await prisma.postFile.createMany({
+          data: fileIds.map((fileId) => ({
+            postId: parseInt(postId),
+            fileId,
+          })),
+        });
+      }
+    }
+
     const updatedPost = await prisma.post.update({
       where: { id: parseInt(postId) },
-      data: validatedData,
+      data: updateData,
       select: {
         id: true,
         title: true,
@@ -129,6 +164,20 @@ export async function PATCH(
           select: {
             id: true,
             name: true,
+          },
+        },
+        files: {
+          select: {
+            file: {
+              select: {
+                id: true,
+                filename: true,
+                originalName: true,
+                mimetype: true,
+                size: true,
+                path: true,
+              },
+            },
           },
         },
       },

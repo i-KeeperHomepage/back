@@ -2,7 +2,13 @@ import { z } from "zod";
 
 export const registerSchema = z.object({
   email: z.string().email().max(100),
-  password: z.string().min(8).max(100),
+  password: z
+    .string()
+    .min(8)
+    .max(100)
+    .regex(/[a-z]/)
+    .regex(/[A-Z]/)
+    .regex(/[!@#$%^&*(),.?":{}|<>]/),
   name: z.string().min(2).max(50),
   major: z.string().min(1).max(100),
   class: z.string().regex(/^\d+\/\d+$/, "Class format must be n/m (e.g., 3/2)"),
@@ -10,12 +16,23 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1),
+  password: z
+    .string()
+    .min(1)
+    .regex(/[a-z]/)
+    .regex(/[A-Z]/)
+    .regex(/[!@#$%^&*(),.?":{}|<>]/),
 });
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1),
-  newPassword: z.string().min(8).max(100),
+  newPassword: z
+    .string()
+    .min(8)
+    .max(100)
+    .regex(/[a-z]/)
+    .regex(/[A-Z]/)
+    .regex(/[!@#$%^&*(),.?":{}|<>]/),
 });
 
 export const approveUserSchema = z.object({
@@ -27,6 +44,7 @@ export const updateUserSchema = z.object({
     .enum(["pending_approval", "active", "inactive", "withdrawn"])
     .optional(),
   roleId: z.number().int().positive().optional(),
+  profileImageId: z.number().int().positive().nullable().optional(),
 });
 
 export const transferRoleSchema = z.object({
@@ -39,12 +57,14 @@ export const createPostSchema = z.object({
   title: z.string().min(1).max(255),
   content: z.string().min(1),
   categoryId: z.number().int().positive(),
+  fileIds: z.array(z.number().int().positive()).optional(),
 });
 
 export const updatePostSchema = z.object({
   title: z.string().min(1).max(255).optional(),
   content: z.string().min(1).optional(),
   categoryId: z.number().int().positive().optional(),
+  fileIds: z.array(z.number().int().positive()).optional(),
 });
 
 export const createCommentSchema = z.object({
@@ -160,8 +180,8 @@ export type UpdateEvaluationInput = z.infer<typeof updateEvaluationSchema>;
 
 // File schemas
 export const uploadFileSchema = z.object({
-  purpose: z.enum(['profile', 'document', 'attachment', 'other']),
-  description: z.string().optional()
+  purpose: z.enum(["profile", "document", "attachment", "other"]),
+  description: z.string().optional(),
 });
 
 export type UploadFileInput = z.infer<typeof uploadFileSchema>;

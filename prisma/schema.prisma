@@ -22,12 +22,14 @@ model User {
   major           String?    @db.VarChar(100)
   class           String?    @db.VarChar(20) // Format: n/m (year/term)
   signatureImageId Int?      @unique @map("signature_image_id")
+  profileImageId  Int?       @unique @map("profile_image_id")
   status          UserStatus @default(pending_approval)
   roleId          Int        @map("role_id")
   createdAt       DateTime   @default(now()) @map("created_at")
 
   role            Role       @relation(fields: [roleId], references: [id])
   signatureImage  File?      @relation("UserSignature", fields: [signatureImageId], references: [id])
+  profileImage    File?      @relation("UserProfile", fields: [profileImageId], references: [id])
   posts           Post[]
   comments        Comment[]
   attendance      Attendance[]
@@ -94,6 +96,7 @@ model Post {
   author     User     @relation(fields: [authorId], references: [id])
   category   Category @relation(fields: [categoryId], references: [id])
   comments   Comment[]
+  files      PostFile[]
 
   @@map("posts")
 }
@@ -197,6 +200,8 @@ model File {
 
   uploader     User     @relation("UserFiles", fields: [uploaderId], references: [id])
   userSignature User?   @relation("UserSignature")
+  userProfile  User?    @relation("UserProfile")
+  posts        PostFile[]
   awards       Award[]
   educationHistories EducationHistory[]
 
@@ -231,4 +236,15 @@ model EducationHistory {
   evidenceFile    File?    @relation(fields: [evidenceFileId], references: [id])
 
   @@map("education_history")
+}
+
+model PostFile {
+  postId Int @map("post_id")
+  fileId Int @map("file_id")
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  file   File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@id([postId, fileId])
+  @@map("post_files")
 }

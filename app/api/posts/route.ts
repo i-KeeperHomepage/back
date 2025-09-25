@@ -45,6 +45,20 @@ export async function GET(request: NextRequest) {
           },
           _count: {
             select: { comments: true }
+          },
+          files: {
+            select: {
+              file: {
+                select: {
+                  id: true,
+                  filename: true,
+                  originalName: true,
+                  mimetype: true,
+                  size: true,
+                  path: true
+                }
+              }
+            }
           }
         },
         orderBy: { createdAt: 'desc' },
@@ -119,7 +133,16 @@ export async function POST(request: NextRequest) {
         title: validatedData.title,
         content: validatedData.content,
         authorId: parseInt(userId),
-        categoryId: validatedData.categoryId
+        categoryId: validatedData.categoryId,
+        ...(validatedData.fileIds && validatedData.fileIds.length > 0
+          ? {
+              files: {
+                create: validatedData.fileIds.map((fileId) => ({
+                  fileId,
+                })),
+              },
+            }
+          : {}),
       },
       select: {
         id: true,
@@ -136,6 +159,20 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             name: true
+          }
+        },
+        files: {
+          select: {
+            file: {
+              select: {
+                id: true,
+                filename: true,
+                originalName: true,
+                mimetype: true,
+                size: true,
+                path: true
+              }
+            }
           }
         }
       }
