@@ -196,7 +196,7 @@ export async function DELETE(
       where: { id: parseInt(userId) },
     });
 
-    return NextResponse.json(null, { status: 204 });
+    return new NextResponse(null, { status: 204 });
   } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

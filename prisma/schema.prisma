@@ -38,6 +38,7 @@ model User {
   files           File[]     @relation("UserFiles")
   awards          Award[]
   educationHistory EducationHistory[]
+  cleanings       CleaningUser[]
 
   @@map("users")
 }
@@ -247,4 +248,27 @@ model PostFile {
 
   @@id([postId, fileId])
   @@map("post_files")
+}
+
+model Cleaning {
+  id          Int      @id @default(autoincrement())
+  date        DateTime @db.Date
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  cleaners    CleaningUser[]
+
+  @@map("cleanings")
+}
+
+model CleaningUser {
+  cleaningId Int @map("cleaning_id")
+  userId     Int @map("user_id")
+
+  cleaning   Cleaning @relation(fields: [cleaningId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@id([cleaningId, userId])
+  @@map("cleaning_users")
 }

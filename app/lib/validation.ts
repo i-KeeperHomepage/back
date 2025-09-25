@@ -208,6 +208,19 @@ export const updateEducationSchema = z.object({
   description: z.string().optional(),
 });
 
+// Cleaning schemas
+export const createCleaningSchema = z.object({
+  date: z.string().datetime(),
+  description: z.string().optional(),
+  userIds: z.array(z.number().int().positive()),
+});
+
+export const updateCleaningSchema = z.object({
+  date: z.string().datetime().optional(),
+  description: z.string().optional(),
+  userIds: z.array(z.number().int().positive()).optional(),
+});
+
 export type CreateAwardInput = z.infer<typeof createAwardSchema>;
 export type UpdateAwardInput = z.infer<typeof updateAwardSchema>;
 export type CreateEducationInput = z.infer<typeof createEducationSchema>;

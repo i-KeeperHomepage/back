@@ -317,4 +317,10 @@ export const PERMISSIONS = {
   CREATE_ANY_EDUCATION: 'create_any_education',
   UPDATE_ANY_EDUCATION: 'update_any_education',
   DELETE_ANY_EDUCATION: 'delete_any_education',
+
+  // Cleaning Management
+  VIEW_CLEANINGS: 'view_cleanings',
+  CREATE_CLEANING: 'create_cleaning',
+  UPDATE_CLEANING: 'update_cleaning',
+  DELETE_CLEANING: 'delete_cleaning',
 } as const;

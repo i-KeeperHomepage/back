@@ -394,7 +394,7 @@ async function main() {
   });
 
   // Create default admin user
-  const hashedPassword = await hash("admin123", 10);
+  const hashedPassword = await hash("iKeeperD2509!@", 10);
 
   const adminUser = await prisma.user.create({
     data: {
@@ -427,8 +427,8 @@ async function main() {
 
   console.log("Seeding completed!");
   console.log("Admin user created:");
-  console.log("  Login ID: admin");
-  console.log("  Password: admin123");
+  console.log("  Login Email: admin@ikeeper.com");
+  console.log("  Password: iKeeperD2509!@");
 }
 
 main()
