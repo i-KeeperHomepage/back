@@ -45,6 +45,12 @@ async function main() {
       data: { action: "create_role", description: "Create new roles" },
     }),
     prisma.permission.create({
+      data: { action: "update_role", description: "Update role details and permissions" },
+    }),
+    prisma.permission.create({
+      data: { action: "delete_role", description: "Delete roles" },
+    }),
+    prisma.permission.create({
       data: {
         action: "transfer_role",
         description: "Transfer roles between users",

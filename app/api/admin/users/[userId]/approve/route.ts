@@ -49,30 +49,43 @@ export async function PATCH(
       );
     }
 
-    const newStatus = validatedData.approve ? "active" : "inactive";
-    const newRoleId = validatedData.approve ? 2 : 3;
+    if (validatedData.approve) {
+      // Approve the user
+      const updatedUser = await prisma.user.update({
+        where: { id: parseInt(userId) },
+        data: {
+          status: "active",
+          roleId: 2  // Set to member role
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          status: true,
+          roleId: true,
+        },
+      });
 
-    const updatedUser = await prisma.user.update({
-      where: { id: parseInt(userId) },
-      data: { status: newStatus, roleId: newRoleId },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        status: true,
-        roleId: true,
-      },
-    });
+      return NextResponse.json(
+        {
+          message: "User approved successfully",
+          user: updatedUser,
+        },
+        { status: 200 }
+      );
+    } else {
+      // Reject and delete the user
+      await prisma.user.delete({
+        where: { id: parseInt(userId) }
+      });
 
-    return NextResponse.json(
-      {
-        message: validatedData.approve
-          ? "User approved successfully"
-          : "User registration rejected",
-        user: updatedUser,
-      },
-      { status: 200 }
-    );
+      return NextResponse.json(
+        {
+          message: "User registration rejected and account deleted",
+        },
+        { status: 200 }
+      );
+    }
   } catch (error: any) {
     if (error.name === "ZodError") {
       return NextResponse.json(

@@ -241,6 +241,8 @@ export const PERMISSIONS = {
   // Role Management
   VIEW_ROLES: 'view_roles',
   CREATE_ROLE: 'create_role',
+  UPDATE_ROLE: 'update_role',
+  DELETE_ROLE: 'delete_role',
   TRANSFER_ROLE: 'transfer_role',
 
   // Post Management

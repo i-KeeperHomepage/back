@@ -53,6 +53,18 @@ export const transferRoleSchema = z.object({
   roleId: z.number().int().positive(),
 });
 
+export const updateRoleSchema = z.object({
+  name: z.string().min(1).max(50).optional(),
+  description: z.string().optional(),
+  permissionIds: z.array(z.number().int().positive()).optional(),
+});
+
+export const createRoleSchema = z.object({
+  name: z.string().min(1).max(50),
+  description: z.string().optional(),
+  permissionIds: z.array(z.number().int().positive()).optional(),
+});
+
 export const createPostSchema = z.object({
   title: z.string().min(1).max(255),
   content: z.string().min(1),
@@ -82,6 +94,8 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type ApproveUserInput = z.infer<typeof approveUserSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type TransferRoleInput = z.infer<typeof transferRoleSchema>;
+export type UpdateRoleInput = z.infer<typeof updateRoleSchema>;
+export type CreateRoleInput = z.infer<typeof createRoleSchema>;
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 export type UpdatePostInput = z.infer<typeof updatePostSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
