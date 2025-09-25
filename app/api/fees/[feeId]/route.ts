@@ -23,11 +23,12 @@ export async function GET(
       where: { id: parseInt(feeId) },
       select: {
         id: true,
+        type: true,
         amount: true,
+        description: true,
         date: true,
-        status: true,
-        paidAt: true,
         createdAt: true,
+        updatedAt: true,
         user: {
           select: {
             id: true,
@@ -76,7 +77,7 @@ export async function GET(
   }
 }
 
-// PATCH /api/fees/[feeId] - Update fee status
+// PATCH /api/fees/[feeId] - Update fee transaction
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ feeId: string }> }
@@ -123,25 +124,20 @@ export async function PATCH(
     // Prepare update data
     const updateData: any = {};
 
+    if (validatedData.type !== undefined) {
+      updateData.type = validatedData.type;
+    }
+
     if (validatedData.amount !== undefined) {
       updateData.amount = validatedData.amount;
     }
 
-    if (validatedData.date) {
-      updateData.date = new Date(validatedData.date);
+    if (validatedData.description !== undefined) {
+      updateData.description = validatedData.description;
     }
 
-    if (validatedData.status) {
-      updateData.status = validatedData.status;
-
-      // If marking as paid, set paidAt date
-      if (validatedData.status === 'paid' && !fee.paidAt) {
-        updateData.paidAt = validatedData.paidAt ? new Date(validatedData.paidAt) : new Date();
-      }
-      // If marking as unpaid, clear paidAt date
-      else if (validatedData.status === 'unpaid') {
-        updateData.paidAt = null;
-      }
+    if (validatedData.date) {
+      updateData.date = new Date(validatedData.date);
     }
 
     const updatedFee = await prisma.fee.update({
@@ -149,10 +145,12 @@ export async function PATCH(
       data: updateData,
       select: {
         id: true,
+        type: true,
         amount: true,
+        description: true,
         date: true,
-        status: true,
-        paidAt: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: {
             id: true,

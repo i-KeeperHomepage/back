@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
+    const type = searchParams.get('type'); // filter by transaction type
     const year = searchParams.get('year');
     const semester = searchParams.get('semester');
     const dateFrom = searchParams.get('dateFrom');
@@ -39,8 +39,8 @@ export async function GET(request: NextRequest) {
 
     const where: any = { userId: parseInt(userId) };
 
-    if (status) {
-      where.status = status;
+    if (type) {
+      where.type = type; // 'deposit' or 'withdrawal'
     }
 
     // Support legacy search by year/semester for backward compatibility
@@ -70,11 +70,12 @@ export async function GET(request: NextRequest) {
         where,
         select: {
           id: true,
+          type: true,
           amount: true,
+          description: true,
           date: true,
-          status: true,
-          paidAt: true,
-          createdAt: true
+          createdAt: true,
+          updatedAt: true
         },
         orderBy: [
           { date: 'desc' },
@@ -86,30 +87,29 @@ export async function GET(request: NextRequest) {
       prisma.fee.count({ where })
     ]);
 
-    // Calculate statistics
+    // Calculate ledger statistics for user
     const allFees = await prisma.fee.findMany({
       where: { userId: parseInt(userId) },
       select: {
         amount: true,
-        status: true
+        type: true
       }
     });
 
     const statistics = {
-      totalAmount: allFees.reduce((sum, fee) => sum + Number(fee.amount), 0),
-      paidAmount: allFees
-        .filter(fee => fee.status === 'paid')
+      totalDeposits: allFees
+        .filter(fee => fee.type === 'deposit')
         .reduce((sum, fee) => sum + Number(fee.amount), 0),
-      unpaidAmount: allFees
-        .filter(fee => fee.status === 'unpaid')
+      depositCount: allFees.filter(fee => fee.type === 'deposit').length,
+      totalWithdrawals: allFees
+        .filter(fee => fee.type === 'withdrawal')
         .reduce((sum, fee) => sum + Number(fee.amount), 0),
-      overdueAmount: allFees
-        .filter(fee => fee.status === 'overdue')
-        .reduce((sum, fee) => sum + Number(fee.amount), 0),
-      totalCount: allFees.length,
-      paidCount: allFees.filter(fee => fee.status === 'paid').length,
-      unpaidCount: allFees.filter(fee => fee.status === 'unpaid').length,
-      overdueCount: allFees.filter(fee => fee.status === 'overdue').length
+      withdrawalCount: allFees.filter(fee => fee.type === 'withdrawal').length,
+      netBalance: allFees.reduce((sum, fee) => {
+        const amount = Number(fee.amount);
+        return fee.type === 'deposit' ? sum + amount : sum - amount;
+      }, 0),
+      totalTransactions: allFees.length
     };
 
     return NextResponse.json(

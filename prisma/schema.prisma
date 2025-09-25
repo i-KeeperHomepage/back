@@ -133,11 +133,12 @@ model Book {
 model Fee {
   id          Int      @id @default(autoincrement())
   userId      Int      @map("user_id")
+  type        String   @db.VarChar(20) // 'deposit' or 'withdrawal'
   amount      Decimal  @db.Decimal(10, 2)
+  description String?  @db.Text
   date        DateTime @db.Date
-  paidAt      DateTime? @map("paid_at")
-  status      String   @default("unpaid") @db.VarChar(20)
   createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   user        User     @relation(fields: [userId], references: [id])
 

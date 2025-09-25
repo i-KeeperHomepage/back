@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
+    const type = searchParams.get("type"); // filter by transaction type
     const year = searchParams.get("year");
     const semester = searchParams.get("semester");
     const userIdFilter = searchParams.get("userId");
@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
 
     const where: any = {};
 
-    if (status) {
-      where.status = status;
+    if (type) {
+      where.type = type; // 'deposit' or 'withdrawal'
     }
 
     // Support legacy search by year/semester for backward compatibility
@@ -76,11 +76,12 @@ export async function GET(request: NextRequest) {
         where,
         select: {
           id: true,
+          type: true,
           amount: true,
+          description: true,
           date: true,
-          status: true,
-          paidAt: true,
           createdAt: true,
+          updatedAt: true,
           user: {
             select: {
               id: true,
@@ -102,28 +103,28 @@ export async function GET(request: NextRequest) {
       prisma.fee.count({ where }),
     ]);
 
-    // Calculate statistics
-    const stats = await prisma.fee.aggregate({
-      where,
+    // Calculate ledger statistics
+    const depositStats = await prisma.fee.aggregate({
+      where: { ...where, type: "deposit" },
       _sum: { amount: true },
       _count: true,
     });
 
-    const paidStats = await prisma.fee.aggregate({
-      where: { ...where, status: "paid" },
+    const withdrawalStats = await prisma.fee.aggregate({
+      where: { ...where, type: "withdrawal" },
       _sum: { amount: true },
       _count: true,
     });
 
     const statistics = {
-      totalAmount: stats._sum.amount || 0,
-      totalCount: stats._count,
-      paidAmount: paidStats._sum.amount || 0,
-      paidCount: paidStats._count,
-      unpaidAmount:
-        (stats._sum.amount?.toNumber() || 0) -
-        (paidStats._sum.amount?.toNumber() || 0),
-      unpaidCount: stats._count - paidStats._count,
+      totalDeposits: depositStats._sum.amount || 0,
+      depositCount: depositStats._count,
+      totalWithdrawals: withdrawalStats._sum.amount || 0,
+      withdrawalCount: withdrawalStats._count,
+      netBalance:
+        (depositStats._sum.amount?.toNumber() || 0) -
+        (withdrawalStats._sum.amount?.toNumber() || 0),
+      totalTransactions: depositStats._count + withdrawalStats._count,
     };
 
     return NextResponse.json(
@@ -185,36 +186,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if fee already exists for this user and date
-    const existingFee = await prisma.fee.findFirst({
-      where: {
-        userId: validatedData.userId,
-        date: new Date(validatedData.date),
-      },
-    });
-
-    if (existingFee) {
-      return NextResponse.json(
-        {
-          error: "Fee record already exists for this user and date",
-        },
-        { status: 400 }
-      );
-    }
+    // In ledger system, multiple transactions can exist on same date
+    // No need to check for existing transactions
 
     const newFee = await prisma.fee.create({
       data: {
         userId: validatedData.userId,
+        type: validatedData.type,
         amount: validatedData.amount,
+        description: validatedData.description,
         date: new Date(validatedData.date),
-        status: "unpaid",
       },
       select: {
         id: true,
+        type: true,
         amount: true,
+        description: true,
         date: true,
-        status: true,
         createdAt: true,
+        updatedAt: true,
         user: {
           select: {
             id: true,

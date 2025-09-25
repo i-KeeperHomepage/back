@@ -142,18 +142,20 @@ export const borrowBookSchema = z.object({
   returnDate: z.string().datetime(),
 });
 
-// Fee schemas
+// Fee schemas (Ledger system)
 export const createFeeSchema = z.object({
   userId: z.number().int().positive(),
+  type: z.enum(["deposit", "withdrawal"]),
   amount: z.number().positive(),
+  description: z.string().optional(),
   date: z.string().datetime(),
 });
 
 export const updateFeeSchema = z.object({
+  type: z.enum(["deposit", "withdrawal"]).optional(),
   amount: z.number().positive().optional(),
+  description: z.string().optional(),
   date: z.string().datetime().optional(),
-  status: z.enum(["unpaid", "paid", "overdue"]).optional(),
-  paidAt: z.string().datetime().optional(),
 });
 
 // Attendance schemas
