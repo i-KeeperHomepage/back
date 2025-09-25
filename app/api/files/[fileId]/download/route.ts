@@ -6,7 +6,7 @@ import path from "path";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const userId = request.headers.get("x-user-id");
@@ -59,7 +59,7 @@ export async function GET(
     const fileBuffer = await fs.readFile(filePath);
 
     // Create response with file
-    const response = new NextResponse(fileBuffer, {
+    const response = new NextResponse(fileBuffer as any, {
       status: 200,
       headers: {
         "Content-Type": file.mimetype,

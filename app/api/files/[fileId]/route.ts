@@ -10,7 +10,7 @@ import path from "path";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const userId = request.headers.get("x-user-id");
@@ -76,7 +76,7 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const userId = request.headers.get("x-user-id");
@@ -85,7 +85,7 @@ export async function DELETE(
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
-    const fileId = parseInt(params.fileId);
+    const fileId = parseInt((await params).fileId);
 
     if (isNaN(fileId)) {
       return NextResponse.json({ error: "Invalid file ID" }, { status: 400 });
