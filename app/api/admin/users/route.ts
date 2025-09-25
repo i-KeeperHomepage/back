@@ -46,7 +46,6 @@ export async function GET(request: NextRequest) {
         where: { roleId: { not: 3 } },
         select: {
           id: true,
-          loginId: true,
           name: true,
           email: true,
           status: true,

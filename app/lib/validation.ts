@@ -1,14 +1,15 @@
 import { z } from "zod";
 
 export const registerSchema = z.object({
-  loginId: z.string().min(3).max(50),
+  email: z.string().email().max(100),
   password: z.string().min(8).max(100),
   name: z.string().min(2).max(50),
-  email: z.string().email().max(100),
+  major: z.string().min(1).max(100),
+  class: z.string().regex(/^\d+\/\d+$/, "Class format must be n/m (e.g., 3/2)"),
 });
 
 export const loginSchema = z.object({
-  loginId: z.string().min(3).max(50),
+  email: z.string().email(),
   password: z.string().min(1),
 });
 
@@ -111,12 +112,12 @@ export const borrowBookSchema = z.object({
 export const createFeeSchema = z.object({
   userId: z.number().int().positive(),
   amount: z.number().positive(),
-  semester: z.string().min(1).max(20),
-  year: z.number().int().min(2000).max(2100),
+  date: z.string().datetime(),
 });
 
 export const updateFeeSchema = z.object({
   amount: z.number().positive().optional(),
+  date: z.string().datetime().optional(),
   status: z.enum(["unpaid", "paid", "overdue"]).optional(),
   paidAt: z.string().datetime().optional(),
 });
@@ -164,3 +165,30 @@ export const uploadFileSchema = z.object({
 });
 
 export type UploadFileInput = z.infer<typeof uploadFileSchema>;
+
+// Award schemas
+export const createAwardSchema = z.object({
+  title: z.string().min(1).max(255),
+  description: z.string().optional(),
+});
+
+export const updateAwardSchema = z.object({
+  title: z.string().min(1).max(255).optional(),
+  description: z.string().optional(),
+});
+
+// Education History schemas
+export const createEducationSchema = z.object({
+  title: z.string().min(1).max(255),
+  description: z.string().optional(),
+});
+
+export const updateEducationSchema = z.object({
+  title: z.string().min(1).max(255).optional(),
+  description: z.string().optional(),
+});
+
+export type CreateAwardInput = z.infer<typeof createAwardSchema>;
+export type UpdateAwardInput = z.infer<typeof updateAwardSchema>;
+export type CreateEducationInput = z.infer<typeof createEducationSchema>;
+export type UpdateEducationInput = z.infer<typeof updateEducationSchema>;

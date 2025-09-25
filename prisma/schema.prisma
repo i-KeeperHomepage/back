@@ -15,22 +15,27 @@ enum UserStatus {
 }
 
 model User {
-  id         Int        @id @default(autoincrement())
-  loginId    String     @unique @map("login_id") @db.VarChar(50)
-  password   String     @db.VarChar(255)
-  name       String     @db.VarChar(50)
-  email      String     @unique @db.VarChar(100)
-  status     UserStatus @default(pending_approval)
-  roleId     Int        @map("role_id")
-  createdAt  DateTime   @default(now()) @map("created_at")
+  id              Int        @id @default(autoincrement())
+  password        String     @db.VarChar(255)
+  name            String     @db.VarChar(50)
+  email           String     @unique @db.VarChar(100)
+  major           String?    @db.VarChar(100)
+  class           String?    @db.VarChar(20) // Format: n/m (year/term)
+  signatureImageId Int?      @unique @map("signature_image_id")
+  status          UserStatus @default(pending_approval)
+  roleId          Int        @map("role_id")
+  createdAt       DateTime   @default(now()) @map("created_at")
 
-  role       Role       @relation(fields: [roleId], references: [id])
-  posts      Post[]
-  comments   Comment[]
-  attendance Attendance[]
-  evaluations Evaluation[]
-  fees       Fee[]
-  files      File[]
+  role            Role       @relation(fields: [roleId], references: [id])
+  signatureImage  File?      @relation("UserSignature", fields: [signatureImageId], references: [id])
+  posts           Post[]
+  comments        Comment[]
+  attendance      Attendance[]
+  evaluations     Evaluation[]
+  fees            Fee[]
+  files           File[]     @relation("UserFiles")
+  awards          Award[]
+  educationHistory EducationHistory[]
 
   @@map("users")
 }
@@ -125,8 +130,7 @@ model Fee {
   id          Int      @id @default(autoincrement())
   userId      Int      @map("user_id")
   amount      Decimal  @db.Decimal(10, 2)
-  semester    String   @db.VarChar(20)
-  year        Int
+  date        DateTime @db.Date
   paidAt      DateTime? @map("paid_at")
   status      String   @default("unpaid") @db.VarChar(20)
   createdAt   DateTime @default(now()) @map("created_at")
@@ -191,7 +195,40 @@ model File {
   uploaderId   Int      @map("uploader_id")
   uploadedAt   DateTime @default(now()) @map("uploaded_at")
 
-  uploader     User     @relation(fields: [uploaderId], references: [id])
+  uploader     User     @relation("UserFiles", fields: [uploaderId], references: [id])
+  userSignature User?   @relation("UserSignature")
+  awards       Award[]
+  educationHistories EducationHistory[]
 
   @@map("files")
+}
+
+model Award {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  title           String   @db.VarChar(255)
+  description     String?  @db.Text
+  evidenceFileId  Int?     @map("evidence_file_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User     @relation(fields: [userId], references: [id])
+  evidenceFile    File?    @relation(fields: [evidenceFileId], references: [id])
+
+  @@map("awards")
+}
+
+model EducationHistory {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  title           String   @db.VarChar(255)
+  description     String?  @db.Text
+  evidenceFileId  Int?     @map("evidence_file_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User     @relation(fields: [userId], references: [id])
+  evidenceFile    File?    @relation(fields: [evidenceFileId], references: [id])
+
+  @@map("education_history")
 }

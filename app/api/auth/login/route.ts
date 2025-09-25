@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const validatedData = loginSchema.parse(body);
 
     const user = await prisma.user.findUnique({
-      where: { loginId: validatedData.loginId },
+      where: { email: validatedData.email },
       include: { role: true },
     });
 
@@ -48,7 +48,6 @@ export async function POST(request: NextRequest) {
 
     const token = await generateToken({
       userId: user.id,
-      loginId: user.loginId,
       email: user.email,
       roleId: user.roleId,
     });
@@ -58,9 +57,10 @@ export async function POST(request: NextRequest) {
         message: "Login successful",
         user: {
           id: user.id,
-          loginId: user.loginId,
           name: user.name,
           email: user.email,
+          major: user.major,
+          class: user.class,
           role: user.role.name,
         },
         accessToken: token,

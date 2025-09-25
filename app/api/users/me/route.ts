@@ -16,11 +16,51 @@ export async function GET(request: NextRequest) {
       where: { id: parseInt(userId) },
       select: {
         id: true,
-        loginId: true,
         name: true,
         email: true,
+        major: true,
+        class: true,
         status: true,
         createdAt: true,
+        signatureImage: {
+          select: {
+            id: true,
+            filename: true,
+            path: true,
+          }
+        },
+        awards: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            evidenceFile: {
+              select: {
+                id: true,
+                filename: true,
+                path: true,
+              }
+            },
+            createdAt: true,
+          },
+          orderBy: { createdAt: 'desc' }
+        },
+        educationHistory: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            evidenceFile: {
+              select: {
+                id: true,
+                filename: true,
+                path: true,
+              }
+            },
+            createdAt: true,
+          },
+          orderBy: { createdAt: 'desc' }
+        },
         role: {
           select: {
             id: true,
@@ -81,11 +121,22 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email } = body;
+    const { name, email, major, class: userClass } = body;
 
     const updateData: any = {};
     if (name) updateData.name = name;
     if (email) updateData.email = email;
+    if (major) updateData.major = major;
+    if (userClass) {
+      // Validate class format (n/m)
+      if (!/^\d+\/\d+$/.test(userClass)) {
+        return NextResponse.json(
+          { error: 'Class format must be n/m (e.g., 3/2)' },
+          { status: 400 }
+        );
+      }
+      updateData.class = userClass;
+    }
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
@@ -115,9 +166,10 @@ export async function PATCH(request: NextRequest) {
       data: updateData,
       select: {
         id: true,
-        loginId: true,
         name: true,
         email: true,
+        major: true,
+        class: true,
         status: true
       }
     });

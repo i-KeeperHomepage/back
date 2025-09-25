@@ -30,6 +30,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const year = searchParams.get('year');
+    const semester = searchParams.get('semester');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const skip = (page - 1) * limit;
@@ -40,8 +43,26 @@ export async function GET(request: NextRequest) {
       where.status = status;
     }
 
-    if (year) {
-      where.year = parseInt(year);
+    // Support legacy search by year/semester for backward compatibility
+    if (year && semester) {
+      // Convert year/semester to date range
+      const startMonth = semester === "1" ? 3 : 9; // 1학기: 3월, 2학기: 9월
+      const endMonth = semester === "1" ? 8 : 2; // 1학기: 8월, 2학기: 2월
+      const startYear = parseInt(year);
+      const endYear = semester === "2" ? startYear + 1 : startYear;
+
+      where.date = {
+        gte: new Date(`${startYear}-${String(startMonth).padStart(2, '0')}-01`),
+        lt: new Date(`${endYear}-${String(endMonth + 1).padStart(2, '0')}-01`),
+      };
+    } else if (dateFrom || dateTo) {
+      where.date = {};
+      if (dateFrom) {
+        where.date.gte = new Date(dateFrom);
+      }
+      if (dateTo) {
+        where.date.lte = new Date(dateTo);
+      }
     }
 
     const [fees, total] = await Promise.all([
@@ -50,15 +71,13 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           amount: true,
-          semester: true,
-          year: true,
+          date: true,
           status: true,
           paidAt: true,
           createdAt: true
         },
         orderBy: [
-          { year: 'desc' },
-          { semester: 'desc' },
+          { date: 'desc' },
           { createdAt: 'desc' }
         ],
         skip,

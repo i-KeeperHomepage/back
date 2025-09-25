@@ -33,6 +33,8 @@ export async function GET(request: NextRequest) {
     const year = searchParams.get("year");
     const semester = searchParams.get("semester");
     const userIdFilter = searchParams.get("userId");
+    const dateFrom = searchParams.get("dateFrom");
+    const dateTo = searchParams.get("dateTo");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
     const skip = (page - 1) * limit;
@@ -43,12 +45,26 @@ export async function GET(request: NextRequest) {
       where.status = status;
     }
 
-    if (year) {
-      where.year = parseInt(year);
-    }
+    // Support legacy search by year/semester for backward compatibility
+    if (year && semester) {
+      // Convert year/semester to date range
+      const startMonth = semester === "1" ? 3 : 9; // 1학기: 3월, 2학기: 9월
+      const endMonth = semester === "1" ? 8 : 2; // 1학기: 8월, 2학기: 2월
+      const startYear = parseInt(year);
+      const endYear = semester === "2" ? startYear + 1 : startYear;
 
-    if (semester) {
-      where.semester = semester;
+      where.date = {
+        gte: new Date(`${startYear}-${String(startMonth).padStart(2, '0')}-01`),
+        lt: new Date(`${endYear}-${String(endMonth + 1).padStart(2, '0')}-01`),
+      };
+    } else if (dateFrom || dateTo) {
+      where.date = {};
+      if (dateFrom) {
+        where.date.gte = new Date(dateFrom);
+      }
+      if (dateTo) {
+        where.date.lte = new Date(dateTo);
+      }
     }
 
     if (userIdFilter) {
@@ -61,8 +77,7 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           amount: true,
-          semester: true,
-          year: true,
+          date: true,
           status: true,
           paidAt: true,
           createdAt: true,
@@ -78,8 +93,7 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: [
-          { year: "desc" },
-          { semester: "desc" },
+          { date: "desc" },
           { createdAt: "desc" },
         ],
         skip,
@@ -171,19 +185,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if fee already exists for this user, year, and semester
+    // Check if fee already exists for this user and date
     const existingFee = await prisma.fee.findFirst({
       where: {
         userId: validatedData.userId,
-        year: validatedData.year,
-        semester: validatedData.semester,
+        date: new Date(validatedData.date),
       },
     });
 
     if (existingFee) {
       return NextResponse.json(
         {
-          error: "Fee record already exists for this user, year, and semester",
+          error: "Fee record already exists for this user and date",
         },
         { status: 400 }
       );
@@ -193,15 +206,13 @@ export async function POST(request: NextRequest) {
       data: {
         userId: validatedData.userId,
         amount: validatedData.amount,
-        semester: validatedData.semester,
-        year: validatedData.year,
+        date: new Date(validatedData.date),
         status: "unpaid",
       },
       select: {
         id: true,
         amount: true,
-        semester: true,
-        year: true,
+        date: true,
         status: true,
         createdAt: true,
         user: {

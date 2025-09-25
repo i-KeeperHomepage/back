@@ -24,8 +24,7 @@ export async function GET(
       select: {
         id: true,
         amount: true,
-        semester: true,
-        year: true,
+        date: true,
         status: true,
         paidAt: true,
         createdAt: true,
@@ -128,6 +127,10 @@ export async function PATCH(
       updateData.amount = validatedData.amount;
     }
 
+    if (validatedData.date) {
+      updateData.date = new Date(validatedData.date);
+    }
+
     if (validatedData.status) {
       updateData.status = validatedData.status;
 
@@ -147,8 +150,7 @@ export async function PATCH(
       select: {
         id: true,
         amount: true,
-        semester: true,
-        year: true,
+        date: true,
         status: true,
         paidAt: true,
         user: {

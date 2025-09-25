@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
           data: { roleId: defaultRole.id },
           select: {
             id: true,
-            loginId: true,
+            email: true,
             name: true,
             role: { select: { name: true } },
           },
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
           data: { roleId: validatedData.roleId },
           select: {
             id: true,
-            loginId: true,
+            email: true,
             name: true,
             role: { select: { name: true } },
           },

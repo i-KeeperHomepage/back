@@ -1,7 +1,7 @@
+import { hasPermission, PERMISSIONS } from "@/app/lib/permissions";
 import { prisma } from "@/app/lib/prisma";
 import { approveUserSchema } from "@/app/lib/validation";
 import { NextRequest, NextResponse } from "next/server";
-import { hasPermission, PERMISSIONS } from "@/app/lib/permissions";
 
 export async function PATCH(
   request: NextRequest,
@@ -57,7 +57,6 @@ export async function PATCH(
       data: { status: newStatus, roleId: newRoleId },
       select: {
         id: true,
-        loginId: true,
         name: true,
         email: true,
         status: true,

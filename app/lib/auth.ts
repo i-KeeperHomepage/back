@@ -14,7 +14,6 @@ const secretKey = new TextEncoder().encode(JWT_SECRET);
 
 export interface JWTPayload extends JoseJWTPayload {
   userId: number;
-  loginId: string;
   email: string;
   roleId: number;
 }

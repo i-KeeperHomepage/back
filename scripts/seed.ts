@@ -200,6 +200,112 @@ async function main() {
     prisma.permission.create({
       data: { action: "download_file", description: "Download files" },
     }),
+
+    // Award Management Permissions
+    prisma.permission.create({
+      data: {
+        action: "view_all_awards",
+        description: "View all awards across users",
+      },
+    }),
+    prisma.permission.create({
+      data: { action: "view_awards", description: "View awards" },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "view_own_awards",
+        description: "View own award records",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "create_own_award",
+        description: "Create own award record",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "update_own_award",
+        description: "Update own award record",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "delete_own_award",
+        description: "Delete own award record",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "create_any_award",
+        description: "Create award for any user",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "update_any_award",
+        description: "Update any user's award",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "delete_any_award",
+        description: "Delete any user's award",
+      },
+    }),
+
+    // Education History Management Permissions
+    prisma.permission.create({
+      data: {
+        action: "view_all_education",
+        description: "View all education records",
+      },
+    }),
+    prisma.permission.create({
+      data: { action: "view_education", description: "View education records" },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "view_own_education",
+        description: "View own education history",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "create_own_education",
+        description: "Create own education record",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "update_own_education",
+        description: "Update own education record",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "delete_own_education",
+        description: "Delete own education record",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "create_any_education",
+        description: "Create education for any user",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "update_any_education",
+        description: "Update any user's education",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "delete_any_education",
+        description: "Delete any user's education",
+      },
+    }),
   ]);
 
   // Group permissions by role
@@ -227,6 +333,14 @@ async function main() {
       "view_own_files",
       "delete_own_file",
       "download_file",
+      "view_own_awards",
+      "create_own_award",
+      "update_own_award",
+      "delete_own_award",
+      "view_own_education",
+      "create_own_education",
+      "update_own_education",
+      "delete_own_education",
     ].includes(p.action)
   );
 
@@ -237,6 +351,8 @@ async function main() {
       "view_categories",
       "view_books",
       "view_events",
+      "view_awards",
+      "view_education",
     ].includes(p.action)
   );
 
@@ -282,7 +398,6 @@ async function main() {
 
   const adminUser = await prisma.user.create({
     data: {
-      loginId: "admin",
       password: hashedPassword,
       name: "System Administrator",
       email: "admin@ikeeper.com",

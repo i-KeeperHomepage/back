@@ -295,4 +295,26 @@ export const PERMISSIONS = {
   DELETE_OWN_FILE: 'delete_own_file',
   DELETE_ANY_FILE: 'delete_any_file',
   DOWNLOAD_FILE: 'download_file',
+
+  // Award Management
+  VIEW_ALL_AWARDS: 'view_all_awards',
+  VIEW_AWARDS: 'view_awards',
+  VIEW_OWN_AWARDS: 'view_own_awards',
+  CREATE_OWN_AWARD: 'create_own_award',
+  UPDATE_OWN_AWARD: 'update_own_award',
+  DELETE_OWN_AWARD: 'delete_own_award',
+  CREATE_ANY_AWARD: 'create_any_award',
+  UPDATE_ANY_AWARD: 'update_any_award',
+  DELETE_ANY_AWARD: 'delete_any_award',
+
+  // Education History Management
+  VIEW_ALL_EDUCATION: 'view_all_education',
+  VIEW_EDUCATION: 'view_education',
+  VIEW_OWN_EDUCATION: 'view_own_education',
+  CREATE_OWN_EDUCATION: 'create_own_education',
+  UPDATE_OWN_EDUCATION: 'update_own_education',
+  DELETE_OWN_EDUCATION: 'delete_own_education',
+  CREATE_ANY_EDUCATION: 'create_any_education',
+  UPDATE_ANY_EDUCATION: 'update_any_education',
+  DELETE_ANY_EDUCATION: 'delete_any_education',
 } as const;
