@@ -40,6 +40,7 @@ export const approveUserSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
+  name: z.string().min(2).max(50).optional(),
   status: z
     .enum(["pending_approval", "active", "inactive", "withdrawn"])
     .optional(),

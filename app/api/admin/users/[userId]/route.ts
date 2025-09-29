@@ -138,6 +138,7 @@ export async function PATCH(
         email: true,
         status: true,
         roleId: true,
+        profileImageId: true,
       },
     });
 
