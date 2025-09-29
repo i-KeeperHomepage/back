@@ -153,7 +153,7 @@ model Attendance {
   checkInAt DateTime? @map("check_in_at")
 
   user      User     @relation(fields: [userId], references: [id])
-  event     CalendarEvent @relation(fields: [eventId], references: [id])
+  event     CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@unique([userId, eventId])
   @@map("attendance")

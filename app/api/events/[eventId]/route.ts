@@ -155,7 +155,7 @@ export async function DELETE(
   { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
-    const { eventId } = await params;
+    const eventId = (await params).eventId;
     const userId = request.headers.get("x-user-id");
 
     if (!userId) {
