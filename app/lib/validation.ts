@@ -84,6 +84,10 @@ export const createCommentSchema = z.object({
   content: z.string().min(1),
 });
 
+export const updateCommentSchema = z.object({
+  content: z.string().min(1),
+});
+
 export const createCategorySchema = z.object({
   name: z.string().min(1).max(50),
   description: z.string().optional(),
@@ -100,6 +104,7 @@ export type CreateRoleInput = z.infer<typeof createRoleSchema>;
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 export type UpdatePostInput = z.infer<typeof updatePostSchema>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
+export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 
 // CalendarEvent schemas

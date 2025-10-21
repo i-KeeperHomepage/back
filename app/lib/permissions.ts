@@ -256,6 +256,10 @@ export const PERMISSIONS = {
   // Comment Management
   CREATE_COMMENT: 'create_comment',
   VIEW_COMMENTS: 'view_comments',
+  EDIT_OWN_COMMENT: 'edit_own_comment',
+  EDIT_ANY_COMMENT: 'edit_any_comment',
+  DELETE_OWN_COMMENT: 'delete_own_comment',
+  DELETE_ANY_COMMENT: 'delete_any_comment',
 
   // Category Management
   VIEW_CATEGORIES: 'view_categories',

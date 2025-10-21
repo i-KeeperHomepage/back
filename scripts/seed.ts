@@ -45,7 +45,10 @@ async function main() {
       data: { action: "create_role", description: "Create new roles" },
     }),
     prisma.permission.create({
-      data: { action: "update_role", description: "Update role details and permissions" },
+      data: {
+        action: "update_role",
+        description: "Update role details and permissions",
+      },
     }),
     prisma.permission.create({
       data: { action: "delete_role", description: "Delete roles" },
@@ -83,6 +86,21 @@ async function main() {
     }),
     prisma.permission.create({
       data: { action: "view_comments", description: "View comments" },
+    }),
+    prisma.permission.create({
+      data: { action: "edit_own_comment", description: "Edit own comments" },
+    }),
+    prisma.permission.create({
+      data: { action: "edit_any_comment", description: "Edit any comment" },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "delete_own_comment",
+        description: "Delete own comments",
+      },
+    }),
+    prisma.permission.create({
+      data: { action: "delete_any_comment", description: "Delete any comment" },
     }),
 
     // Category Management Permissions

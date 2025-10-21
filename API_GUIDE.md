@@ -2,7 +2,7 @@
 
 **Base URL:** `http://ip:3000/api`
 **Test Date:** 2025-09-29
-**Total Endpoints:** 74
+**Total Endpoints:** 77
 
 ---
 
@@ -423,7 +423,7 @@ curl -X POST http://ip:3000/api/admin/roles/transfer \
 
 ---
 
-## 3. Posts & Comments Endpoints (7 endpoints)
+## 3. Posts & Comments Endpoints (10 endpoints)
 
 ### 3.1 Get Posts
 
@@ -623,6 +623,84 @@ curl -X POST http://ip:3000/api/posts/1/comments \
   "createdAt": "2025-09-29T05:35:00.000Z"
 }
 ```
+
+### 3.8 Get Comment Details
+
+**Endpoint:** `GET /api/posts/{postId}/comments/{commentId}`
+
+**Request Example:**
+
+```bash
+curl -X GET http://ip:3000/api/posts/1/comments/1 \
+  -b cookies.txt
+```
+
+**Response Example:**
+
+```json
+{
+  "id": 1,
+  "content": "This is a comment",
+  "postId": 1,
+  "author": {
+    "id": 1,
+    "name": "System Administrator"
+  },
+  "createdAt": "2025-09-29T05:35:00.000Z",
+  "updatedAt": "2025-09-29T05:35:00.000Z"
+}
+```
+
+### 3.9 Update Comment
+
+**Endpoint:** `PATCH /api/posts/{postId}/comments/{commentId}`
+
+**Request Example:**
+
+```bash
+curl -X PATCH http://ip:3000/api/posts/1/comments/1 \
+  -b cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{"content": "Updated comment content"}'
+```
+
+**Response Example:**
+
+```json
+{
+  "id": 1,
+  "content": "Updated comment content",
+  "author": {
+    "id": 1,
+    "name": "System Administrator"
+  },
+  "createdAt": "2025-09-29T05:35:00.000Z",
+  "updatedAt": "2025-09-29T05:40:00.000Z"
+}
+```
+
+**Permission Requirements:**
+- Must be comment author OR have `edit_any_comment` permission
+
+### 3.10 Delete Comment
+
+**Endpoint:** `DELETE /api/posts/{postId}/comments/{commentId}`
+
+**Request Example:**
+
+```bash
+curl -X DELETE http://ip:3000/api/posts/1/comments/1 \
+  -b cookies.txt
+```
+
+**Response Example:**
+
+```
+204 No Content
+```
+
+**Permission Requirements:**
+- Must be comment author OR have `delete_any_comment` permission
 
 ---
 
@@ -2044,13 +2122,13 @@ curl -X GET http://ip:3000/api/users/me/education \
 
 ## Summary
 
-**Total Endpoints Tested:** 74
+**Total Endpoints Tested:** 77
 
 ### Endpoint Categories:
 
 1. **Authentication:** 3 endpoints ✓
 2. **Admin Management:** 11 endpoints ✓
-3. **Posts & Comments:** 7 endpoints ✓
+3. **Posts & Comments:** 10 endpoints ✓
 4. **Categories:** 2 endpoints ✓
 5. **Books:** 7 endpoints ✓
 6. **Events:** 6 endpoints ✓
