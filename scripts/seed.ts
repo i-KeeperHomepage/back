@@ -425,6 +425,7 @@ async function main() {
       password: hashedPassword,
       name: "System Administrator",
       email: "admin@ikeeper.com",
+      studentId: "ADMIN001",
       status: "active",
       roleId: adminRole.id,
     },

@@ -1,6 +1,7 @@
 import { hashPassword } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/prisma";
 import { registerSchema } from "@/app/lib/validation";
+import { isEmailVerified, cleanupVerificationRecord } from "@/app/lib/email";
 import { NextRequest, NextResponse } from "next/server";
 import formidable from "formidable";
 import { promises as fs } from "fs";
@@ -12,6 +13,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = registerSchema.parse(body);
 
+    // Check if email is verified
+    const emailVerified = await isEmailVerified(validatedData.email);
+    if (!emailVerified) {
+      return NextResponse.json(
+        {
+          error:
+            "Email not verified. Please verify your email before registration.",
+        },
+        { status: 400 }
+      );
+    }
+
     // Check if email already exists
     const existingUser = await prisma.user.findUnique({
       where: { email: validatedData.email },
@@ -20,6 +33,18 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { error: "User with this email already exists" },
+        { status: 400 }
+      );
+    }
+
+    // Check if studentId already exists
+    const existingStudentId = await prisma.user.findUnique({
+      where: { studentId: validatedData.studentId },
+    });
+
+    if (existingStudentId) {
+      return NextResponse.json(
+        { error: "User with this student ID already exists" },
         { status: 400 }
       );
     }
@@ -68,6 +93,7 @@ export async function POST(request: NextRequest) {
         email: validatedData.email,
         password: hashedPassword,
         name: validatedData.name,
+        studentId: validatedData.studentId,
         major: validatedData.major,
         class: validatedData.class,
         signatureImageId: signatureImageId,
@@ -78,6 +104,7 @@ export async function POST(request: NextRequest) {
         id: true,
         email: true,
         name: true,
+        studentId: true,
         major: true,
         class: true,
         status: true,
@@ -92,6 +119,9 @@ export async function POST(request: NextRequest) {
         data: { uploaderId: newUser.id },
       });
     }
+
+    // Clean up verification record after successful registration
+    await cleanupVerificationRecord(validatedData.email);
 
     return NextResponse.json(
       {

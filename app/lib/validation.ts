@@ -10,8 +10,18 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/)
     .regex(/[!@#$%^&*(),.?":{}|<>]/),
   name: z.string().min(2).max(50),
+  studentId: z.string().min(1).max(20),
   major: z.string().min(1).max(100),
   class: z.string().regex(/^\d+\/\d+$/, "Class format must be n/m (e.g., 3/2)"),
+});
+
+export const sendVerificationCodeSchema = z.object({
+  email: z.string().email().max(100),
+});
+
+export const verifyCodeSchema = z.object({
+  email: z.string().email().max(100),
+  code: z.string().length(6, "Verification code must be 6 digits"),
 });
 
 export const loginSchema = z.object({
@@ -94,6 +104,10 @@ export const createCategorySchema = z.object({
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type SendVerificationCodeInput = z.infer<
+  typeof sendVerificationCodeSchema
+>;
+export type VerifyCodeInput = z.infer<typeof verifyCodeSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type ApproveUserInput = z.infer<typeof approveUserSchema>;

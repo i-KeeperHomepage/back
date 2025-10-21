@@ -2,15 +2,80 @@
 
 **Base URL:** `http://ip:3000/api`
 **Test Date:** 2025-09-29
-**Total Endpoints:** 77
+**Total Endpoints:** 79
 
 ---
 
-## 1. Authentication Endpoints (3 endpoints)
+## 1. Authentication Endpoints (5 endpoints)
 
-### 1.1 User Registration
+### 1.1 Send Verification Code
+
+**Endpoint:** `POST /api/auth/send-verification-code`
+
+**Description:** Sends a 6-digit verification code to the provided email address. This is the first step in the registration process.
+
+**Request Example:**
+
+```bash
+curl -X POST http://ip:3000/api/auth/send-verification-code \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "testuser@example.com"
+  }'
+```
+
+**Response Example:**
+
+```json
+{
+  "message": "Verification code sent to your email",
+  "email": "testuser@example.com"
+}
+```
+
+**Error Responses:**
+- `400 Bad Request` - Email already exists
+- `500 Internal Server Error` - Failed to send email
+
+---
+
+### 1.2 Verify Code
+
+**Endpoint:** `POST /api/auth/verify-code`
+
+**Description:** Verifies the 6-digit code sent to the user's email. Must be completed within 10 minutes of sending the code.
+
+**Request Example:**
+
+```bash
+curl -X POST http://ip:3000/api/auth/verify-code \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "testuser@example.com",
+    "code": "123456"
+  }'
+```
+
+**Response Example:**
+
+```json
+{
+  "message": "Email verified successfully",
+  "verified": true,
+  "email": "testuser@example.com"
+}
+```
+
+**Error Responses:**
+- `400 Bad Request` - Invalid or expired verification code
+
+---
+
+### 1.3 User Registration
 
 **Endpoint:** `POST /api/auth/register`
+
+**Description:** Completes user registration. Email must be verified first using endpoints 1.1 and 1.2.
 
 **Request Example:**
 
@@ -21,6 +86,7 @@ curl -X POST http://ip:3000/api/auth/register \
     "email": "testuser@example.com",
     "password": "TestPass123!",
     "name": "Test User",
+    "studentId": "2021123456",
     "major": "Computer Science",
     "class": "3/5"
   }'
@@ -35,6 +101,7 @@ curl -X POST http://ip:3000/api/auth/register \
     "id": 4,
     "email": "testuser@example.com",
     "name": "Test User",
+    "studentId": "2021123456",
     "major": "Computer Science",
     "class": "3/5",
     "status": "pending_approval",
@@ -43,7 +110,27 @@ curl -X POST http://ip:3000/api/auth/register \
 }
 ```
 
-### 1.2 Login
+**Field Requirements:**
+- `email` (required): Valid email address
+- `password` (required): Min 8 chars, must contain uppercase, lowercase, and special character
+- `name` (required): 2-50 characters
+- `studentId` (required): 1-20 characters, must be unique
+- `major` (required): 1-100 characters
+- `class` (required): Format n/m (e.g., "3/2")
+
+**Error Responses:**
+- `400 Bad Request` - Email not verified or already exists
+- `400 Bad Request` - Student ID already exists
+- `400 Bad Request` - Validation failed
+
+**Registration Flow:**
+1. Send verification code to email (1.1)
+2. Verify the code (1.2)
+3. Complete registration with verified email (1.3)
+
+---
+
+### 1.4 Login
 
 **Endpoint:** `POST /api/auth/login`
 
@@ -55,7 +142,8 @@ curl -X POST http://ip:3000/api/auth/login \
   -d '{
     "email": "admin@ikeeper.com",
     "password": "iKeeperD2509!@"
-  }'
+  }' \
+  -c cookies.txt
 ```
 
 **Response Example:**
@@ -75,7 +163,7 @@ curl -X POST http://ip:3000/api/auth/login \
 }
 ```
 
-### 1.3 Logout
+### 1.5 Logout
 
 **Endpoint:** `POST /api/auth/logout`
 
