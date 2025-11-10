@@ -118,6 +118,7 @@ model Comment {
   authorId  Int      @map("author_id")
   postId    Int      @map("post_id")
   createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   author    User     @relation(fields: [authorId], references: [id])
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -178,6 +179,7 @@ model Evaluation {
   comments   String?  @db.Text
   evaluatorId Int     @map("evaluator_id")
   createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   user       User     @relation(fields: [userId], references: [id])
 
@@ -193,6 +195,7 @@ model CalendarEvent {
   location    String?  @db.VarChar(255)
   eventType   String   @map("event_type") @db.VarChar(50)
   createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   attendance  Attendance[]
 
