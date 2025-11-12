@@ -3,6 +3,21 @@ import { prisma } from "@/app/lib/prisma";
 import { loginSchema } from "@/app/lib/validation";
 import { NextRequest, NextResponse } from "next/server";
 
+function setCORSHeaders(res: NextResponse) {
+  res.headers.set("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.headers.set("Access-Control-Allow-Credentials", "true");
+  res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+  return res;
+}
+
+export async function OPTIONS() {
+  return setCORSHeaders(new NextResponse(null, { status: 204 }));
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -14,10 +29,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
+      const res = NextResponse.json(
         { error: "Invalid login credentials" },
         { status: 401 }
       );
+      return setCORSHeaders(res);
     }
 
     const isPasswordValid = await verifyPassword(
@@ -26,24 +42,27 @@ export async function POST(request: NextRequest) {
     );
 
     if (!isPasswordValid) {
-      return NextResponse.json(
+      const res = NextResponse.json(
         { error: "Invalid login credentials" },
         { status: 401 }
       );
+      return setCORSHeaders(res);
     }
 
     if (user.status === "pending_approval") {
-      return NextResponse.json(
+      const res = NextResponse.json(
         { error: "Your account is pending approval" },
         { status: 403 }
       );
+      return setCORSHeaders(res);
     }
 
     if (user.status === "inactive" || user.status === "withdrawn") {
-      return NextResponse.json(
+      const res = NextResponse.json(
         { error: "Your account is not active" },
         { status: 403 }
       );
+      return setCORSHeaders(res);
     }
 
     const token = await generateToken({
@@ -78,19 +97,19 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    return response;
+    return setCORSHeaders(response);
   } catch (error: any) {
-    if (error.name === "ZodError") {
-      return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
-        { status: 400 }
-      );
-    }
-
     console.error("Login error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const res =
+      error.name === "ZodError"
+        ? NextResponse.json(
+            { error: "Validation failed", details: error.errors },
+            { status: 400 }
+          )
+        : NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+          );
+    return setCORSHeaders(res);
   }
 }
