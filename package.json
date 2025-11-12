@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
+    "@types/cors": "^2.8.19",
     "bcrypt-ts": "^7.1.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "formidable": "^3.5.4",
     "jose": "^6.1.0",

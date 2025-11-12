@@ -67,6 +67,11 @@ export async function middleware(request: NextRequest) {
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set("x-user-id", (await payload).userId.toString());
       requestHeaders.set("x-user-role", (await payload).roleId.toString());
+      requestHeaders.set(
+        "Access-Control-Allow-Origin",
+        process.env.BASE_URL || ""
+      );
+      requestHeaders.set("Access-Control-Allow-Credentials", "true");
 
       // Permission checks are now handled in individual route handlers
       // This allows for more granular permission control

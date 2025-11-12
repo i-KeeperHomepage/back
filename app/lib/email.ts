@@ -1,8 +1,6 @@
 import { Resend } from "resend";
 import { prisma } from "./prisma";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 /**
  * Generate a random 6-digit verification code
  */
@@ -17,6 +15,7 @@ export async function sendVerificationEmail(
   email: string,
   code: string
 ): Promise<{ success: boolean; error?: string }> {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const { data, error } = await resend.emails.send({
       from: `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM}>`,

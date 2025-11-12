@@ -1,15 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { prisma } from "@/app/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.headers.get('x-user-id');
+    const userId = request.headers.get("x-user-id");
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID not found' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -27,14 +24,14 @@ export async function GET(request: NextRequest) {
             id: true,
             filename: true,
             path: true,
-          }
+          },
         },
         profileImage: {
           select: {
             id: true,
             filename: true,
             path: true,
-          }
+          },
         },
         awards: {
           select: {
@@ -46,11 +43,11 @@ export async function GET(request: NextRequest) {
                 id: true,
                 filename: true,
                 path: true,
-              }
+              },
             },
             createdAt: true,
           },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: "desc" },
         },
         educationHistory: {
           select: {
@@ -62,11 +59,11 @@ export async function GET(request: NextRequest) {
                 id: true,
                 filename: true,
                 path: true,
-              }
+              },
             },
             createdAt: true,
           },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: "desc" },
         },
         role: {
           select: {
@@ -79,21 +76,18 @@ export async function GET(request: NextRequest) {
                   select: {
                     id: true,
                     action: true,
-                    description: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    description: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const formattedUser = {
@@ -102,15 +96,17 @@ export async function GET(request: NextRequest) {
         id: user.role.id,
         name: user.role.name,
         description: user.role.description,
-        permissions: user.role.permissions.map(rp => rp.permission)
-      }
+        permissions: user.role.permissions.map((rp) => rp.permission),
+      },
     };
+
+    console.log(formattedUser);
 
     return NextResponse.json(formattedUser, { status: 200 });
   } catch (error) {
-    console.error('Get user error:', error);
+    console.error("Get user error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
@@ -118,13 +114,10 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const userId = request.headers.get('x-user-id');
+    const userId = request.headers.get("x-user-id");
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID not found' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -138,7 +131,7 @@ export async function PATCH(request: NextRequest) {
       // Validate class format (n/m)
       if (!/^\d+\/\d+$/.test(userClass)) {
         return NextResponse.json(
-          { error: 'Class format must be n/m (e.g., 3/2)' },
+          { error: "Class format must be n/m (e.g., 3/2)" },
           { status: 400 }
         );
       }
@@ -150,7 +143,7 @@ export async function PATCH(request: NextRequest) {
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
-        { error: 'No valid fields to update' },
+        { error: "No valid fields to update" },
         { status: 400 }
       );
     }
@@ -159,13 +152,13 @@ export async function PATCH(request: NextRequest) {
       const existingUser = await prisma.user.findFirst({
         where: {
           email,
-          NOT: { id: parseInt(userId) }
-        }
+          NOT: { id: parseInt(userId) },
+        },
       });
 
       if (existingUser) {
         return NextResponse.json(
-          { error: 'Email already in use' },
+          { error: "Email already in use" },
           { status: 400 }
         );
       }
@@ -185,17 +178,17 @@ export async function PATCH(request: NextRequest) {
           select: {
             id: true,
             filename: true,
-            path: true
-          }
-        }
-      }
+            path: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (error) {
-    console.error('Update user error:', error);
+    console.error("Update user error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
