@@ -330,6 +330,30 @@ async function main() {
         description: "Delete any user's education",
       },
     }),
+    prisma.permission.create({
+      data: {
+        action: "view_cleanings",
+        description: "View cleaning schedules",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "create_cleanings",
+        description: "Create cleaning schedules",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "update_cleanings",
+        description: "Update cleaning schedules",
+      },
+    }),
+    prisma.permission.create({
+      data: {
+        action: "delete_cleanings",
+        description: "Delete cleaning schedules",
+      },
+    }),
   ]);
 
   // Group permissions by role

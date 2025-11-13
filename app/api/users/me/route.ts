@@ -100,8 +100,6 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    console.log(formattedUser);
-
     return NextResponse.json(formattedUser, { status: 200 });
   } catch (error) {
     console.error("Get user error:", error);

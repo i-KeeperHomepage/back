@@ -2,18 +2,14 @@ import { verifyToken } from "@/app/lib/auth";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "https://yourdomain.com",
-  "https://www.yourdomain.com",
-];
+const allowedOrigins = ["https://yourdomain.com", "https://www.yourdomain.com"];
 
 export async function middleware(request: NextRequest) {
   const origin = request.headers.get("origin");
 
   // 허용된 origin인지 확인
   const isAllowed = origin && allowedOrigins.includes(origin);
+  console.log("allow: ", isAllowed, " origin: ", origin);
 
   if (request.method === "OPTIONS") {
     return new NextResponse(null, {
@@ -69,7 +65,7 @@ export async function middleware(request: NextRequest) {
       requestHeaders.set("x-user-role", (await payload).roleId.toString());
       requestHeaders.set(
         "Access-Control-Allow-Origin",
-        process.env.BASE_URL || ""
+        process.env.FRONT_URL || ""
       );
       requestHeaders.set("Access-Control-Allow-Credentials", "true");
 

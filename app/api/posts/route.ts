@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
         status: 200,
         headers: {
           "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Origin": `${process.env.BASE_URL}`,
+          "Access-Control-Allow-Origin": `${process.env.FRONT_URL}`,
         },
       }
     );

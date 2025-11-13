@@ -4,7 +4,7 @@ import { loginSchema } from "@/app/lib/validation";
 import { NextRequest, NextResponse } from "next/server";
 
 function setCORSHeaders(res: NextResponse) {
-  res.headers.set("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.headers.set("Access-Control-Allow-Origin", `${process.env.FRONT_URL}`);
   res.headers.set("Access-Control-Allow-Credentials", "true");
   res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.headers.set(
